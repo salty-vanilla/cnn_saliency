@@ -1,7 +1,7 @@
 import numpy as np
-from tensorflow.contrib.keras.python.keras.datasets import mnist
-from tensorflow.contrib.keras.python.keras.preprocessing.image import Iterator
-from tensorflow.contrib.keras.python.keras.utils import to_categorical
+from tensorflow.python.keras.datasets import mnist
+from tensorflow.python.keras.preprocessing.image import Iterator
+from tensorflow.python.keras.utils import to_categorical
 
 
 class DataGenerator(Iterator):
@@ -39,7 +39,7 @@ class DataGenerator(Iterator):
     def _flow_on_training(self):
         # get minibatch indices
         with self.lock:
-            index_array, current_index, current_batch_size = next(self.index_generator)
+            index_array = next(self.index_generator)
         image_batch = self.x[index_array]
         label_batch = self.y[index_array]
         return image_batch, label_batch
@@ -48,7 +48,7 @@ class DataGenerator(Iterator):
         # create indices
         indexes = np.arange(self.n)
 
-        # calucuate steps per a test
+        # calculate steps per a test
         steps = self.n // self.batch_size
         if self.n % self.batch_size != 0:
             steps += 1

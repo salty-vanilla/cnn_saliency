@@ -1,18 +1,18 @@
 import os
 import tensorflow as tf
-from tensorflow.contrib.keras.python.keras.layers import Dense, Activation, Conv2D, MaxPool2D, Flatten
-from tensorflow.contrib.keras.python.keras.losses import categorical_crossentropy
-from tensorflow.contrib.keras.python.keras.metrics import categorical_accuracy
+from tensorflow.python.keras.layers import Dense, Activation, Conv2D, MaxPool2D, Flatten, GlobalAveragePooling2D
+from tensorflow.python.keras.losses import categorical_crossentropy
+from tensorflow.python.keras.metrics import categorical_accuracy
 
 
-class MLP:
+class CNN:
     def __init__(self,
                  input_shape=(784, ),
                  nb_classes=10,
                  optimizer=tf.train.AdamOptimizer(1e-3)):
         # create graph
         self.input_ = tf.placeholder(tf.float32, [None] + list(input_shape))
-        self.logit, self.output = self.build(self.input_, nb_classes)
+        self.feature_map, self.logit, self.output = self.build(self.input_, nb_classes)
         self.t = tf.placeholder(tf.float32, self.output.get_shape())
         self.loss = tf.reduce_mean(categorical_crossentropy(self.t, self.output))
         self.acc = tf.reduce_mean(categorical_accuracy(self.t, self.output))
@@ -23,15 +23,15 @@ class MLP:
         self.sess.run(tf.global_variables_initializer())
 
     def build(self, x, nb_classes):
-        _x = Conv2D(8, (3, 3), activation='relu')(x)
+        _x = Conv2D(16, (3, 3), activation='relu', padding='same')(x)
         _x = MaxPool2D()(_x)
-        _x = Conv2D(16, (3, 3), activation='relu')(_x)
-        _x = MaxPool2D()(_x)
+        _x = Conv2D(32, (3, 3), activation='relu', padding='same')(_x)
+        feature_map = _x
+        _x = GlobalAveragePooling2D()(_x)
         _x = Flatten()(_x)
-        _x = Dense(128, activation='relu')(_x)
         logits = Dense(nb_classes, activation=None)(_x)
         outputs = Activation('softmax')(logits)
-        return logits, outputs
+        return feature_map, logits, outputs
 
     def fit(self, data_generator, nb_epoch, model_dir):
         batch_size = data_generator.batch_size
