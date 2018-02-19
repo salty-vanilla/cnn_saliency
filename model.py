@@ -24,11 +24,15 @@ class CNN:
 
     def build(self, x, nb_classes):
         _x = Conv2D(16, (3, 3), activation='relu', padding='same')(x)
+        _x = Conv2D(16, (3, 3), activation='relu', padding='same')(_x)
         _x = MaxPool2D()(_x)
         _x = Conv2D(32, (3, 3), activation='relu', padding='same')(_x)
+        _x = Conv2D(32, (3, 3), activation='relu', padding='same')(_x)
+        _x = MaxPool2D()(_x)
         feature_map = _x
-        _x = GlobalAveragePooling2D()(_x)
+        # _x = GlobalAveragePooling2D()(_x)
         _x = Flatten()(_x)
+        _x = Dense(512, activation='relu')(_x)
         logits = Dense(nb_classes, activation=None)(_x)
         outputs = Activation('softmax')(logits)
         return feature_map, logits, outputs
